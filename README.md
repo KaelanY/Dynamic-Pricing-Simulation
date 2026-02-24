@@ -10,7 +10,7 @@ This project is a simulation of how different pricing strategies perform in a ma
    * **___:** ___
    * **___:** ___
    
-* **Interactive Dashboard:** real-time visualization.
+* **Interactive Dashboard:** real-time visualisation.
 
 ## Setup
 1. Clone the repository.
