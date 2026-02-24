@@ -6,8 +6,9 @@ This project is a simulation of how different pricing strategies perform in a ma
 
 ## Key Features
 * **Demand Shocks:** Randomly occurring events that shift the demand curve.
-* **Competing Strategies:**  * **___:** ___
-    * **___:** ___
+* **Competing Strategies:** *
+   * **___:** ___
+   * **___:** ___
    
 * **Interactive Dashboard:** real-time visualization.
 
