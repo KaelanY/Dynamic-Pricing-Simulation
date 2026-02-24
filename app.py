@@ -23,4 +23,3 @@ class MarketEngine:
         quantity = self.demand(price)
         revenue = price*quantity
         return revenue
-
