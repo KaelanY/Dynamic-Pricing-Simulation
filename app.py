@@ -29,7 +29,7 @@ steps = st.sidebar.slider("Steps per run", 1, 50, 10)
 if st.sidebar.button("Run Simulation"):
     for _ in range(steps):
         sim.step(shock_prob, magnitude)
-        
+
 fig, ax = plt.subplots(figsize=(6, 3))
 
 for name, data in sim.history.items():
@@ -37,10 +37,8 @@ for name, data in sim.history.items():
 
 ax.set_title("Profit over time")
 ax.legend()
-
 st.pyplot(fig)
-
 st.subheader("Cumulative Profit")
 
 for name, total in sim.cumulative_profit.items():
-    st.write(f"{name}: {total:.2f}")
+    st.markdown(f"**{name}: ${total:,.2f}**")
