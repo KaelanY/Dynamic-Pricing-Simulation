@@ -41,4 +41,4 @@ st.pyplot(fig)
 st.subheader("Cumulative Profit")
 
 for name, total in sim.cumulative_profit.items():
-    st.markdown(f"**{name}: ${total:,.2f}**")
+    st.markdown(f"**{name}:** ${total:,.2f}")
