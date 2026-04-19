@@ -14,13 +14,12 @@ class ExploratoryStrategy(BaseStrategy):
         if last_profit > self.best_profit:
             self.best_profit = last_profit
             self.best_price = self.last_price
-            
-        self.baseline = 0.8 * self.baseline + 0.2 * self.best_price
-        
-        if random.random() < 0.3:
-            price = random.uniform(1, 50)
+            self.baseline = self.best_price
+
+        if random.random() < 0.15:
+            price = random.uniform(1, 80)
         else:
-            price = self.baseline + random.uniform(-3, 3)
+            price = self.baseline + random.uniform(-1, 1)
 
         price = max(0.1, price)
         self.last_price = price
