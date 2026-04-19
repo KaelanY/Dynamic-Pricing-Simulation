@@ -1,21 +1,28 @@
 import random
+from collections import defaultdict
 from .base import BaseStrategy
 
-class ExploratoryStrategy(BaseStrategy):
-    def __init__(self):
-        self.baseline = 10
+class MLExploratoryStrategy(BaseStrategy):
+    def __init__(self, epsilon=0.2):
+        self.epsilon = epsilon
+        self.q_values = defaultdict(float)
+        self.counts = defaultdict(int)
+        self.last_price = 10
 
     def choose_price(self, state):
-        history = state.get("history", [])
+        last_profit = state.get("last_profit", 0)
 
-        if len(history) > 5:
-            best = max(history, key=lambda x: x[1])
-            best_price = best[0]
-            self.baseline = best_price
+        if self.last_price is not None:
+            c = self.counts[self.last_price]
+            q = self.q_values[self.last_price]
 
-        if random.random() < 0.2:
-            price = random.uniform(1, 300)
+            self.q_values[self.last_price] = q + (last_profit - q) / (c + 1)
+            self.counts[self.last_price] += 1
+
+        if random.random() < self.epsilon:
+            price = random.uniform(1, 80)
         else:
-            price = self.baseline + random.uniform(-2, 2)
+            price = max(self.q_values, key=self.q_values.get, default=10)
 
-        return max(0.1, price)
+        self.last_price = price
+        return price
