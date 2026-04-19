@@ -2,49 +2,55 @@ import random
 import math
 from .base import BaseStrategy
 
-class AdaptiveExploratoryStrategy(BaseStrategy):
+class AdaptiveExplatoryStrategyV2(BaseStrategy):
     def __init__(self):
-        self.q_values = {}
+        self.bins = [i for i in range(1, 101)]
+        self.q_values = {b: 0.0 for b in self.bins}
+        self.counts = {b: 0 for b in self.bins}
+
         self.last_price = 10
-        self.temperature = 5.0
+        self.temperature = 2.0
+
         self.best_price = 10
         self.best_value = float("-inf")
 
+        self.alpha = 0.1
+
+    def _closest_bin(self, price):
+        return min(self.bins, key=lambda x: abs(x - price))
+
     def choose_price(self, state):
         last_profit = state.get("last_profit", 0)
-        
-        if self.last_price not in self.q_values:
-            self.q_values[self.last_price] = last_profit
-        else:
-            self.q_values[self.last_price] = (
-                0.85 * self.q_values[self.last_price]
-                + 0.15 * last_profit
-            )
+
+        b = self._closest_bin(self.last_price)
+        self.counts[b] += 1
+
+        self.q_values[b] += self.alpha * (last_profit - self.q_values[b])
 
         if last_profit > self.best_value:
             self.best_value = last_profit
             self.best_price = self.last_price
 
-        self.temperature *= 0.995
+        self.temperature = max(0.1, self.temperature * 0.995)
 
-        if random.random() < 0.02:
-            self.temperature = 5.0
-
-        prices = list(self.q_values.keys())
-
-        if len(prices) < 5 or random.random() < self.temperature / 10:
+        if random.random() < 0.1:
             price = random.uniform(1, 100)
         else:
-            weights = []
-            for p in prices:
-                q = self.q_values[p]
-                weights.append(math.exp(q / max(self.temperature, 0.1)))
+            max_q = max(self.q_values.values())
+            weights = [
+                math.exp((self.q_values[b] - max_q) / self.temperature)
+                for b in self.bins
+            ]
 
             total = sum(weights)
             probs = [w / total for w in weights]
 
-            price = random.choices(prices, weights=probs, k=1)[0]
-            price += random.uniform(-3, 3)
+            chosen_bin = random.choices(self.bins, weights=probs, k=1)[0]
 
-        self.last_price = max(0.1, price)
+            price = chosen_bin + random.uniform(-2, 2)
+
+        if random.random() < 0.2:
+            price = self.best_price + random.uniform(-1, 1)
+
+        self.last_price = max(0.1, min(100, price))
         return self.last_price
