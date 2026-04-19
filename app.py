@@ -1,25 +1,48 @@
 import streamlit as st
+import matplotlib.pyplot as plt
 from engine import MarketEngine
+from simulation import Simulation
+from strategies.simple import SimpleStrategy
+from strategies.greedy import GreedyStrategy
+from strategies.exploratory import ExploratoryStrategy
 
-st.title("Market Simulation")
+st.title("Pricing Simulation")
 
-if "engine" not in st.session_state:
-    st.session_state.engine = MarketEngine(100, 1)
+if "sim" not in st.session_state:
+    engine = MarketEngine(100, 1)
 
-engine = st.session_state.engine
+    strategies = {
+        "Simple": SimpleStrategy(10),
+        "Greedy": GreedyStrategy(10),
+        "Exploratory": ExploratoryStrategy(10)
+    }
 
-price = st.slider("Price", 0.0, 100.0, 1.0)
-shock_prob = st.slider("Shock Probability", 0.0, 1.0, 0.1)
-magnitude = st.slider("Shock Magnitude", 0.0, 1.0, 0.1)
+    st.session_state.sim = Simulation(engine, strategies)
 
-if st.button("Next Time Step"):
-    revenue, quantity, shock = engine.step(price, shock_prob, magnitude)
+sim = st.session_state.sim
 
-    st.write(f"Round: {engine.round}")
-    st.write(f"Quantity: {quantity:.2f}")
-    st.write(f"Revenue: {revenue:.2f}")
-    st.write(f"Intercept: {engine.intercept:.2f}")
-    st.write(f"Slope: {engine.slope:.2f}")
+shock_prob = st.sidebar.slider("Shock Probability", 0.0, 1.0, 0.1)
+magnitude = st.sidebar.slider("Shock Magnitude", 0.0, 1.0, 0.1)
 
-    if shock:
-        st.warning("Shock occurred!")
+steps = st.sidebar.slider("Steps per run", 1, 50, 10)
+
+if st.sidebar.button("Run Simulation"):
+    for _ in range(steps):
+        sim.step(shock_prob, magnitude)
+
+    st.success("Simulation updated!")
+
+fig, ax = plt.subplots(figsize=(6, 4))
+
+for name, data in sim.history.items():
+    ax.plot(data["profits"], label=name)
+
+ax.set_title("Profit over time")
+ax.legend()
+
+st.pyplot(fig)
+
+st.subheader("Cumulative Profit")
+
+for name, total in sim.cumulative_profit.items():
+    st.write(f"{name}: {total:.2f}")
