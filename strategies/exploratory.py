@@ -14,7 +14,7 @@ class ExploratoryStrategy(BaseStrategy):
             self.baseline = best_price
 
         if random.random() < 0.2:
-            price = random.uniform(1, 80)
+            price = random.uniform(1, 300)
         else:
             price = self.baseline + random.uniform(-2, 2)
 
