@@ -1,11 +1,10 @@
 from .base import BaseStrategy
 
 class GreedyStrategy(BaseStrategy):
-    def __init__(self):
-        self.price = 50.0
+    def __init__(self, price=50.0):
+        self.price = float(price)
         self.last_profit = None
-        self.last_price = None
-        self.direction = 1  # 1 = raising -1 = lowering
+        self.direction = 1
         self.step_size = 10.0
         self.streak = 0
 
@@ -14,11 +13,9 @@ class GreedyStrategy(BaseStrategy):
 
         if self.last_profit is not None:
             if last_profit > self.last_profit:
-               
                 self.streak += 1
                 self.step_size = min(self.step_size * 1.5, 20.0)
             else:
-                
                 self.direction *= -1
                 self.streak = 0
                 self.step_size = max(self.step_size * 0.5, 1.0)
@@ -27,5 +24,4 @@ class GreedyStrategy(BaseStrategy):
         self.price = max(1.0, min(100.0, self.price))
 
         self.last_profit = last_profit
-        self.last_price = self.price
         return self.price
